@@ -26,7 +26,7 @@ from nattka.package import (find_repository, match_package_list,
                             add_keywords, check_dependencies,
                             PackageMatchException, KeywordNotSpecified,
                             PackageListEmpty, PackageListDoneAlready,
-                            KeywordNoneLeft, is_allarches, is_masked,
+                            KeywordNoneLeft, is_masked,
                             package_list_to_json, merge_package_list,
                             expand_package_list, ExpandImpossible,
                             format_results, filter_prefix_keywords,
@@ -702,7 +702,7 @@ class NattkaCommands(object):
 
                     # check if we have ALLARCHES to toggle
                     allarches = (b.category == BugCategory.STABLEREQ
-                                 and all(is_allarches(x) for x in plist)
+                                 and all(x.stabilize_allarches for x in plist)
                                  and can_allarches_for_keywords(
                                      repo, check_packages.items()))
                     allarches_chg = (allarches != ('ALLARCHES' in b.keywords))
