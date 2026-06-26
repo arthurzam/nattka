@@ -20,7 +20,7 @@ from nattka.package import (match_package_list, add_keywords,
                             KeywordNotSpecified, PackageListEmpty,
                             KeywordNoneLeft, find_repository,
                             select_best_version, package_list_to_json,
-                            merge_package_list, is_allarches,
+                            merge_package_list,
                             expand_package_list, ExpandImpossible,
                             format_results, filter_prefix_keywords,
                             is_masked, load_profiles, MaskReason,
@@ -1170,48 +1170,28 @@ class MergePackageListTests(BaseRepoTestCase):
 class IsAllArchesTests(BaseRepoTestCase):
     def test_allarches(self):
         self.assertTrue(
-            is_allarches(
-                self.get_package('=test/amd64-stable-hppa-testing-1')))
+            self.get_package('=test/amd64-stable-hppa-testing-1')
+            .stabilize_allarches)
 
     def test_not_allarches(self):
         self.assertFalse(
-            is_allarches(
-                self.get_package('=test/amd64-stable-1')))
+            self.get_package('=test/amd64-stable-1').stabilize_allarches)
 
     def test_no_metadata_xml(self):
         self.assertFalse(
-            is_allarches(
-                self.get_package('=test/amd64-testing-1')))
+            self.get_package('=test/amd64-testing-1').stabilize_allarches)
 
     def test_restrict_match1(self):
         self.assertTrue(
-            is_allarches(
-                self.get_package('=test/mixed-keywords-1')))
+            self.get_package('=test/mixed-keywords-1').stabilize_allarches)
 
     def test_restrict_mismatch(self):
         self.assertFalse(
-            is_allarches(
-                self.get_package('=test/mixed-keywords-3')))
+            self.get_package('=test/mixed-keywords-3').stabilize_allarches)
 
     def test_restrict_match2(self):
         self.assertTrue(
-            is_allarches(
-                self.get_package('=test/mixed-keywords-9999')))
-
-    def test_malformed_xml(self):
-        with self.assertRaises(lxml.etree.XMLSyntaxError):
-            is_allarches(
-                self.get_package('=test/malformed-metadata-xml-1'))
-
-    def test_malformed_restrict(self):
-        with self.assertRaises(PackageInvalid):
-            is_allarches(
-                self.get_package('=test/malformed-restrict-1'))
-
-    def test_wrong_packagerestrict(self):
-        with self.assertRaises(PackageInvalid):
-            is_allarches(
-                self.get_package('=test/wrong-package-restrict-1'))
+            self.get_package('=test/mixed-keywords-9999').stabilize_allarches)
 
 
 class CanAllArchesForKeywordsTests(BaseRepoTestCase):

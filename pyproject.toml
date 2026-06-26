@@ -12,7 +12,7 @@ requires-python = ">=3.12"
 dependencies = [
     "lxml",
     "pkgcheck",
-    "pkgcore",
+    "pkgcore >=0.12.35",
     "requests",
     "snakeoil",
 ]
