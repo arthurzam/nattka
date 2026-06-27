@@ -10,8 +10,6 @@ import unittest
 
 from pathlib import Path
 
-import lxml.etree
-
 from pkgcore.ebuild.atom import atom
 
 from nattka.bugzilla import BugCategory, BugInfo
