@@ -3,14 +3,13 @@
 
 """ Bugzilla support. """
 
-import datetime
 import enum
 import typing
+from datetime import datetime, timezone
 
 import requests
 
 from nattka.keyword import keyword_sort_key
-
 
 BUGZILLA_API_URL = 'https://bugs.gentoo.org/rest'
 
@@ -92,7 +91,7 @@ class BugInfo(typing.NamedTuple):
     keywords: typing.List[str] = []
     whiteboard: str = ''
     assigned_to: str = ''
-    last_change_time: datetime.datetime = datetime.datetime.utcnow()
+    last_change_time: datetime = datetime.now(timezone.utc)
     runtime_testing_required: typing.Optional[BugRuntimeTestingState] = None
 
 
@@ -127,8 +126,8 @@ def make_bug_info(bug: typing.Dict[str, typing.Any]
                    keywords=bug['keywords'],
                    whiteboard=bug['whiteboard'],
                    assigned_to=bug['assigned_to'],
-                   last_change_time=datetime.datetime.fromisoformat(
-                       bug['last_change_time'].rstrip('Z')),
+                   last_change_time=datetime.fromisoformat(
+                       bug['last_change_time']),
                    runtime_testing_required=runtime_testing_required)
 
 

@@ -4,7 +4,6 @@
 """ CLI for nattka. """
 
 import argparse
-import datetime
 import fnmatch
 import itertools
 import json
@@ -12,6 +11,7 @@ import logging
 import sys
 import typing
 
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from snakeoil.fileutils import AtomicWriteFile
@@ -45,6 +45,19 @@ except ImportError:
 BUGZILLA_MAX_COMMENT_LEN = 16384
 
 log = logging.getLogger('nattka')
+
+
+def _parse_cache_time(value: str) -> datetime:
+    """
+    Parse a cache ``last-check`` timestamp into an aware UTC datetime.
+
+    Timestamps written by older versions are naive (no offset); assume
+    those are UTC for backwards compatibility.
+    """
+    dt = datetime.fromisoformat(value)
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+    return dt
 
 
 class DependentBugError(Exception):
@@ -395,7 +408,7 @@ class NattkaCommands(object):
         repo, git_repo = self.get_git_repository()
 
         with git_repo:
-            start_time = datetime.datetime.utcnow()
+            start_time = datetime.now(timezone.utc)
             packages = self.args.package
             if self.args.arch is None:
                 initial_arches = '*'
@@ -483,7 +496,7 @@ class NattkaCommands(object):
 
                 it += 1
 
-        end_time = datetime.datetime.utcnow()
+        end_time = datetime.now(timezone.utc)
         log.info(f'Time elapsed: {end_time - start_time}')
         log.info(f'Target CC: {" ".join(cc_arches)}')
 
@@ -559,12 +572,12 @@ class NattkaCommands(object):
         cache = self.get_cache()
         cache.setdefault('bugs', {})
 
-        start_time = datetime.datetime.utcnow()
+        start_time = datetime.now(timezone.utc)
         log.info(f'NATTkA starting at {start_time}')
         end_time = None
         if self.args.time_limit is not None:
             end_time = (start_time
-                        + datetime.timedelta(seconds=self.args.time_limit))
+                        + timedelta(seconds=self.args.time_limit))
             log.info(f'... will process until {end_time}')
 
         bz = self.get_bugzilla(require_api_key=self.args.update_bugs)
@@ -579,7 +592,7 @@ class NattkaCommands(object):
                     log.info(f'Reached limit of {self.args.bug_limit} bugs')
                     break
                 if (end_time is not None
-                        and datetime.datetime.utcnow() > end_time):
+                        and datetime.now(timezone.utc) > end_time):
                     log.info('Reached time limit')
                     break
 
@@ -728,11 +741,9 @@ class NattkaCommands(object):
                               is not b.sanity_check):
                             log.info('Sanity-check flag changed, '
                                      'will recheck.')
-                        elif (datetime.datetime.utcnow()
-                              - datetime.datetime.strptime(
-                                last_check, '%Y-%m-%dT%H:%M:%S')
-                              > datetime.timedelta(
-                                seconds=self.args.cache_max_age)):
+                        elif (datetime.now(timezone.utc)
+                              - _parse_cache_time(last_check)
+                              > timedelta(seconds=self.args.cache_max_age)):
                             log.info('Cache entry is old, will recheck.')
                         elif (not cache_entry.get('updated')
                               and self.args.update_bugs):
@@ -754,7 +765,7 @@ class NattkaCommands(object):
 
                         cache_entry = cache['bugs'][str(bno)] = {
                             'last-check':
-                                datetime.datetime.utcnow().isoformat(
+                                datetime.now(timezone.utc).isoformat(
                                     timespec='seconds'),
                             'package-list': plist_json,
                             'check-res': check_res,
@@ -889,7 +900,7 @@ class NattkaCommands(object):
                     log.info(f'New comment: {comment}')
         finally:
             self.write_cache(cache)
-            end_time = datetime.datetime.utcnow()
+            end_time = datetime.now(timezone.utc)
             log.info(f'NATTkA exiting at {end_time}')
             log.info(f'Total time elapsed: {end_time - start_time}')
 

@@ -3,10 +3,10 @@
 
 """ Minimal keyword mangling routines. """
 
-import datetime
 import re
 import typing
 
+from datetime import datetime, timezone
 from pathlib import Path
 
 from snakeoil.fileutils import AtomicWriteFile
@@ -36,7 +36,7 @@ def keyword_sort_key(kw: str
 
 
 def update_copyright(copyright_line: str,
-                     target_year: int = datetime.datetime.utcnow().year,
+                     target_year: int = datetime.now(timezone.utc).year,
                      ) -> str:
     """
     Update copyright date and owner in `copyright_line`.
