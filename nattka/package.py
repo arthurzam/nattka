@@ -425,7 +425,7 @@ def expand_package_list(repo: UnconfiguredTree,
             elif w == '^':
                 assert prev_kw is not None
                 if not prev_kw:
-                    if len(cur_kw) > 1:
+                    if cur_kw and len(cur_kw) > 1:
                         raise ExpandImpossible(
                             'keywords along with empty ^')
                     had_empty_above = True
