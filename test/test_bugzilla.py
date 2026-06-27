@@ -45,7 +45,8 @@ class BugzillaTests(unittest.TestCase):
         bugs = {1: BugInfo(None, '\r\n', blocks=[2],
                            assigned_to='test@example.com',
                            last_change_time=datetime.datetime(
-                               2020, 4, 3, 13, 22, 41)),
+                               2020, 4, 3, 13, 22, 41,
+                               tzinfo=datetime.timezone.utc)),
                 2: BugInfo(BugCategory.KEYWORDREQ,
                            'dev-python/unittest-mixins-1.6\r\n'
                            'dev-python/coverage-4.5.4\r\n',
@@ -56,7 +57,8 @@ class BugzillaTests(unittest.TestCase):
                            sanity_check=True,
                            assigned_to='test@example.com',
                            last_change_time=datetime.datetime(
-                               2020, 4, 3, 13, 34, 59)),
+                               2020, 4, 3, 13, 34, 59,
+                               tzinfo=datetime.timezone.utc)),
                 3: BugInfo(BugCategory.STABLEREQ,
                            'dev-python/mako-1.1.0 amd64\r\n',
                            [f'{x}@gentoo.org' for x in ('amd64',)],
@@ -65,7 +67,8 @@ class BugzillaTests(unittest.TestCase):
                            sanity_check=False,
                            assigned_to='bug-wranglers@gentoo.org',
                            last_change_time=datetime.datetime(
-                               2020, 11, 26, 9, 42, 55),
+                               2020, 11, 26, 9, 42, 55,
+                               tzinfo=datetime.timezone.utc),
                            runtime_testing_required=(
                                BugRuntimeTestingState.MANUAL)),
                 4: BugInfo(BugCategory.KEYWORDREQ,
@@ -76,7 +79,8 @@ class BugzillaTests(unittest.TestCase):
                            keywords=['KEYWORDREQ'],
                            assigned_to='test@example.com',
                            last_change_time=datetime.datetime(
-                               2020, 4, 3, 13, 34, 55),
+                               2020, 4, 3, 13, 34, 55,
+                               tzinfo=datetime.timezone.utc),
                            runtime_testing_required=(
                                BugRuntimeTestingState.YES)),
                 5: BugInfo(None,
@@ -86,7 +90,8 @@ class BugzillaTests(unittest.TestCase):
                            security=True,
                            assigned_to='test@example.com',
                            last_change_time=datetime.datetime(
-                               2020, 4, 10, 9, 47, 22),
+                               2020, 4, 10, 9, 47, 22,
+                               tzinfo=datetime.timezone.utc),
                            runtime_testing_required=(
                                BugRuntimeTestingState.YES)),
                 6: BugInfo(None,
@@ -94,7 +99,8 @@ class BugzillaTests(unittest.TestCase):
                            security=True,
                            assigned_to='test@example.com',
                            last_change_time=datetime.datetime(
-                               2020, 4, 3, 13, 31, 19),
+                               2020, 4, 3, 13, 31, 19,
+                               tzinfo=datetime.timezone.utc),
                            runtime_testing_required=(
                                BugRuntimeTestingState.YES)),
                 7: BugInfo(BugCategory.STABLEREQ,
@@ -103,7 +109,8 @@ class BugzillaTests(unittest.TestCase):
                            keywords=['ALLARCHES'],
                            assigned_to='test@example.com',
                            last_change_time=datetime.datetime(
-                               2020, 4, 3, 13, 28, 17),
+                               2020, 4, 3, 13, 28, 17,
+                               tzinfo=datetime.timezone.utc),
                            runtime_testing_required=(
                                BugRuntimeTestingState.YES)),
                 8: BugInfo(BugCategory.STABLEREQ,
@@ -111,13 +118,15 @@ class BugzillaTests(unittest.TestCase):
                            resolved=True,
                            assigned_to='test@example.com',
                            last_change_time=datetime.datetime(
-                               2020, 4, 4, 7, 7, 56)),
+                               2020, 4, 4, 7, 7, 56,
+                               tzinfo=datetime.timezone.utc)),
                 9: BugInfo(BugCategory.KEYWORDREQ,
                            'dev-python/frobnicate-11\r\n',
                            depends=[2],
                            assigned_to='test@example.com',
                            last_change_time=datetime.datetime(
-                               2020, 4, 5, 14, 35, 59)),
+                               2020, 4, 5, 14, 35, 59,
+                               tzinfo=datetime.timezone.utc)),
                 }
         for k in list(bugs):
             if k not in req:

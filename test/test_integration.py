@@ -33,7 +33,7 @@ class FakeDateTime:
     def __init__(self, dt):
         self._dt = dt
 
-    def utcnow(self):
+    def now(self, tz=None):
         return self._dt
 
 
@@ -100,7 +100,8 @@ class IntegrationNoActionTests(IntegrationTestCase):
                             '\r\n',
                             sanity_check=initial_status,
                             last_change_time=datetime.datetime(
-                                2020, 1, 1, 12, 0, 0)),
+                                2020, 1, 1, 12, 0, 0,
+                                tzinfo=datetime.timezone.utc)),
         }
         bugz_inst.resolve_dependencies.return_value = (
             bugz_inst.find_bugs.return_value)
@@ -167,7 +168,8 @@ class IntegrationNoActionTests(IntegrationTestCase):
                             'test/alpha-amd64-hppa-testing-2\r\n',
                             sanity_check=True,
                             last_change_time=datetime.datetime(
-                                2020, 1, 1, 12, 0, 0)),
+                                2020, 1, 1, 12, 0, 0,
+                                tzinfo=datetime.timezone.utc)),
         }
         bugz_inst.resolve_dependencies.return_value = (
             bugz_inst.find_bugs.return_value)
@@ -211,7 +213,8 @@ class IntegrationNoActionTests(IntegrationTestCase):
                             keywords=['CC-ARCHES'],
                             sanity_check=True,
                             last_change_time=datetime.datetime(
-                                2020, 1, 1, 12, 0, 0)),
+                                2020, 1, 1, 12, 0, 0,
+                                tzinfo=datetime.timezone.utc)),
         }
         bugz_inst.resolve_dependencies.return_value = (
             bugz_inst.find_bugs.return_value)
@@ -233,7 +236,8 @@ class IntegrationNoActionTests(IntegrationTestCase):
         bugz_inst.find_bugs.return_value = {
             560322: BugInfo(None, '',
                             last_change_time=datetime.datetime(
-                                2020, 1, 1, 12, 0, 0)),
+                                2020, 1, 1, 12, 0, 0,
+                                tzinfo=datetime.timezone.utc)),
         }
         bugz_inst.resolve_dependencies.return_value = (
             bugz_inst.find_bugs.return_value)
@@ -272,7 +276,8 @@ class IntegrationNoActionTests(IntegrationTestCase):
                             'test/amd64-stable-1 amd64',
                             sanity_check=True,
                             last_change_time=datetime.datetime(
-                                2020, 1, 1, 12, 0, 0)),
+                                2020, 1, 1, 12, 0, 0,
+                                tzinfo=datetime.timezone.utc)),
         }
         bugz_inst.resolve_dependencies.return_value = (
             bugz_inst.find_bugs.return_value)
@@ -293,7 +298,8 @@ class IntegrationNoActionTests(IntegrationTestCase):
                             'test/amd64-stable-1',
                             sanity_check=True,
                             last_change_time=datetime.datetime(
-                                2020, 1, 1, 12, 0, 0)),
+                                2020, 1, 1, 12, 0, 0,
+                                tzinfo=datetime.timezone.utc)),
         }
         bugz_inst.resolve_dependencies.return_value = (
             bugz_inst.find_bugs.return_value)
@@ -313,7 +319,8 @@ class IntegrationSuccessTests(IntegrationTestCase):
                    bugz: MagicMock,
                    initial_status: typing.Optional[bool] = None,
                    last_change_time: datetime.datetime = datetime.datetime(
-                       2020, 1, 1, 12, 0, 0),
+                       2020, 1, 1, 12, 0, 0,
+                       tzinfo=datetime.timezone.utc),
                    **kwargs
                    ) -> MagicMock:
         bugz_inst = bugz.return_value
@@ -873,9 +880,10 @@ class IntegrationSuccessTests(IntegrationTestCase):
     @patch('nattka.__main__.NattkaBugzilla')
     def test_sanity_cache_expired(self, bugz, add_keywords):
         bugz_inst = self.bug_preset(bugz, initial_status=True)
-        last_check = datetime.datetime.utcnow() - datetime.timedelta(days=1)
-        with patch('nattka.__main__.datetime.datetime') as mocked_dt:
-            mocked_dt.utcnow.return_value = last_check
+        last_check = (datetime.datetime.now(datetime.timezone.utc)
+                      - datetime.timedelta(days=1))
+        with patch('nattka.__main__.datetime') as mocked_dt:
+            mocked_dt.now.return_value = last_check
             self.assertEqual(
                 main(self.common_args + ['sanity-check', '--update-bugs',
                                          '560322', '--cache-file',
@@ -911,7 +919,8 @@ class IntegrationSuccessTests(IntegrationTestCase):
                             'test/amd64-testing-1 ~alpha\r\n',
                             sanity_check=True,
                             last_change_time=datetime.datetime(
-                                2020, 1, 1, 12, 0, 0)),
+                                2020, 1, 1, 12, 0, 0,
+                                tzinfo=datetime.timezone.utc)),
         }
         bugz_inst.resolve_dependencies.return_value = (
             bugz_inst.find_bugs.return_value)
@@ -933,7 +942,8 @@ class IntegrationSuccessTests(IntegrationTestCase):
                             ['alpha@gentoo.org', 'hppa@gentoo.org'],
                             sanity_check=True,
                             last_change_time=datetime.datetime(
-                                2020, 1, 1, 12, 0, 0)),
+                                2020, 1, 1, 12, 0, 0,
+                                tzinfo=datetime.timezone.utc)),
         }
         bugz_inst.resolve_dependencies.return_value = (
             bugz_inst.find_bugs.return_value)
@@ -964,7 +974,8 @@ class IntegrationSuccessTests(IntegrationTestCase):
                             ['alpha@gentoo.org'],
                             sanity_check=True,
                             last_change_time=datetime.datetime(
-                                2020, 1, 1, 12, 0, 0)),
+                                2020, 1, 1, 12, 0, 0,
+                                tzinfo=datetime.timezone.utc)),
         }
         bugz_inst.resolve_dependencies.return_value = (
             bugz_inst.find_bugs.return_value)
@@ -983,7 +994,8 @@ class IntegrationSuccessTests(IntegrationTestCase):
                             ['alpha@gentoo.org', 'hppa@gentoo.org'],
                             sanity_check=True,
                             last_change_time=datetime.datetime(
-                                2020, 1, 1, 12, 0, 0)),
+                                2020, 1, 1, 12, 0, 0,
+                                tzinfo=datetime.timezone.utc)),
         }
         bugz_inst.resolve_dependencies.return_value = (
             bugz_inst.find_bugs.return_value)
@@ -1005,14 +1017,16 @@ class IntegrationSuccessTests(IntegrationTestCase):
                             depends=[560311],
                             sanity_check=True,
                             last_change_time=datetime.datetime(
-                                2020, 1, 1, 12, 0, 0)),
+                                2020, 1, 1, 12, 0, 0,
+                                tzinfo=datetime.timezone.utc)),
         }
         bugz_inst.resolve_dependencies.return_value = {
             560311: BugInfo(BugCategory.KEYWORDREQ,
                             'test/amd64-testing-1 ~alpha\r\n',
                             blocks=[560322],
                             last_change_time=datetime.datetime(
-                                2020, 1, 1, 12, 0, 0)),
+                                2020, 1, 1, 12, 0, 0,
+                                tzinfo=datetime.timezone.utc)),
         }
         bugz_inst.resolve_dependencies.return_value.update(
             bugz_inst.find_bugs.return_value)
@@ -1044,14 +1058,16 @@ class IntegrationSuccessTests(IntegrationTestCase):
                             depends=[560311],
                             sanity_check=True,
                             last_change_time=datetime.datetime(
-                                2020, 1, 1, 12, 0, 0)),
+                                2020, 1, 1, 12, 0, 0,
+                                tzinfo=datetime.timezone.utc)),
         }
         bugz_inst.resolve_dependencies.return_value = {
             560311: BugInfo(BugCategory.KEYWORDREQ,
                             'test/amd64-testing-1 ~alpha\r\n',
                             blocks=[560322],
                             last_change_time=datetime.datetime(
-                                2020, 1, 1, 12, 0, 0)),
+                                2020, 1, 1, 12, 0, 0,
+                                tzinfo=datetime.timezone.utc)),
         }
         bugz_inst.resolve_dependencies.return_value.update(
             bugz_inst.find_bugs.return_value)
@@ -1070,7 +1086,8 @@ class IntegrationSuccessTests(IntegrationTestCase):
                             'test/amd64-testing-deps-1 ~alpha\r\n',
                             sanity_check=True,
                             last_change_time=datetime.datetime(
-                                2020, 1, 1, 12, 0, 0)),
+                                2020, 1, 1, 12, 0, 0,
+                                tzinfo=datetime.timezone.utc)),
         }
         bugz_inst.resolve_dependencies.return_value = (
             bugz_inst.find_bugs.return_value)
@@ -1092,14 +1109,16 @@ class IntegrationSuccessTests(IntegrationTestCase):
                             depends=[560311],
                             sanity_check=True,
                             last_change_time=datetime.datetime(
-                                2020, 1, 1, 12, 0, 0)),
+                                2020, 1, 1, 12, 0, 0,
+                                tzinfo=datetime.timezone.utc)),
         }
         bugz_inst.resolve_dependencies.return_value = {
             560311: BugInfo(BugCategory.KEYWORDREQ,
                             'test/amd64-testing-1 ~alpha\r\n',
                             blocks=[560322],
                             last_change_time=datetime.datetime(
-                                2020, 1, 1, 12, 0, 0)),
+                                2020, 1, 1, 12, 0, 0,
+                                tzinfo=datetime.timezone.utc)),
         }
         bugz_inst.resolve_dependencies.return_value.update(
             bugz_inst.find_bugs.return_value)
@@ -1118,7 +1137,8 @@ class IntegrationSuccessTests(IntegrationTestCase):
                             'test/amd64-testing-1 ~alpha ~hppa\r\n',
                             blocks=[560322],
                             last_change_time=datetime.datetime(
-                                2020, 1, 1, 12, 0, 0)),
+                                2020, 1, 1, 12, 0, 0,
+                                tzinfo=datetime.timezone.utc)),
         })
         self.assertEqual(
             main(self.common_args + ['sanity-check', '--update-bugs',
@@ -1185,12 +1205,14 @@ class IntegrationSuccessTests(IntegrationTestCase):
                             'test/amd64-testing-1 ~alpha\r\n',
                             blocks=[560322],
                             last_change_time=datetime.datetime(
-                                2020, 1, 1, 12, 0, 0)),
+                                2020, 1, 1, 12, 0, 0,
+                                tzinfo=datetime.timezone.utc)),
             560322: BugInfo(BugCategory.KEYWORDREQ,
                             'test/amd64-testing-deps-1 ~alpha\r\n',
                             depends=[560311],
                             last_change_time=datetime.datetime(
-                                2020, 1, 1, 12, 0, 0)),
+                                2020, 1, 1, 12, 0, 0,
+                                tzinfo=datetime.timezone.utc)),
         }
         bugz_inst.resolve_dependencies.return_value = (
             bugz_inst.find_bugs.return_value)
@@ -1217,14 +1239,16 @@ class IntegrationSuccessTests(IntegrationTestCase):
                             'test/amd64-testing-deps-1 ~alpha\r\n',
                             depends=[560311],
                             last_change_time=datetime.datetime(
-                                2020, 1, 1, 12, 0, 0)),
+                                2020, 1, 1, 12, 0, 0,
+                                tzinfo=datetime.timezone.utc)),
         }
         bugz_inst.resolve_dependencies.return_value = {
             560311: BugInfo(BugCategory.KEYWORDREQ,
                             'test/amd64-testing-1 ~alpha\r\n',
                             blocks=[560322],
                             last_change_time=datetime.datetime(
-                                2020, 1, 1, 12, 0, 0)),
+                                2020, 1, 1, 12, 0, 0,
+                                tzinfo=datetime.timezone.utc)),
         }
         bugz_inst.resolve_dependencies.return_value.update(
             bugz_inst.find_bugs.return_value)
@@ -1251,14 +1275,16 @@ class IntegrationSuccessTests(IntegrationTestCase):
                             'test/mixed-keywords-4 ~alpha\r\n',
                             depends=[560311],
                             last_change_time=datetime.datetime(
-                                2020, 1, 1, 12, 0, 0)),
+                                2020, 1, 1, 12, 0, 0,
+                                tzinfo=datetime.timezone.utc)),
         }
         bugz_inst.resolve_dependencies.return_value = {
             560311: BugInfo(BugCategory.KEYWORDREQ,
                             'test/amd64-testing-deps-1 ~alpha\r\n',
                             blocks=[560322],
                             last_change_time=datetime.datetime(
-                                2020, 1, 1, 12, 0, 0)),
+                                2020, 1, 1, 12, 0, 0,
+                                tzinfo=datetime.timezone.utc)),
         }
         bugz_inst.resolve_dependencies.return_value.update(
             bugz_inst.find_bugs.return_value)
@@ -1285,7 +1311,8 @@ class IntegrationSuccessTests(IntegrationTestCase):
                             'test/amd64-testing-deps-1 ~alpha\r\n',
                             depends=[560311],
                             last_change_time=datetime.datetime(
-                                2020, 1, 1, 12, 0, 0)),
+                                2020, 1, 1, 12, 0, 0,
+                                tzinfo=datetime.timezone.utc)),
         }
         self.assertEqual(
             main(self.common_args + ['sanity-check', '--update-bugs',
@@ -1305,7 +1332,8 @@ class IntegrationSuccessTests(IntegrationTestCase):
                             'test/amd64-testing alpha\r\n',
                             sanity_check=None,
                             last_change_time=datetime.datetime(
-                                2020, 1, 1, 12, 0, 0)),
+                                2020, 1, 1, 12, 0, 0,
+                                tzinfo=datetime.timezone.utc)),
         }
         bugz_inst.resolve_dependencies.return_value = (
             bugz_inst.find_bugs.return_value)
@@ -1325,7 +1353,8 @@ class IntegrationSuccessTests(IntegrationTestCase):
                             'test/amd64-testing-deps-1 ~alpha\r\n'
                             'test/amd64-testing-1 ^\r\n',
                             last_change_time=datetime.datetime(
-                                2020, 1, 1, 12, 0, 0)),
+                                2020, 1, 1, 12, 0, 0,
+                                tzinfo=datetime.timezone.utc)),
         }
         bugz_inst.resolve_dependencies.return_value = (
             bugz_inst.find_bugs.return_value)
@@ -1348,7 +1377,8 @@ class IntegrationSuccessTests(IntegrationTestCase):
                             'test/amd64-testing-2 amd64\r\n',
                             cc=['hppa@gentoo.org'],
                             last_change_time=datetime.datetime(
-                                2020, 1, 1, 12, 0, 0)),
+                                2020, 1, 1, 12, 0, 0,
+                                tzinfo=datetime.timezone.utc)),
         }
         bugz_inst.resolve_dependencies.return_value = (
             bugz_inst.find_bugs.return_value)
@@ -1425,7 +1455,8 @@ class IntegrationSuccessTests(IntegrationTestCase):
                             'x86-macos sparc-freebsd\r\n',
                             keywords=['CC-ARCHES'],
                             last_change_time=datetime.datetime(
-                                2020, 1, 1, 12, 0, 0)),
+                                2020, 1, 1, 12, 0, 0,
+                                tzinfo=datetime.timezone.utc)),
         }
         bugz_inst.resolve_dependencies.return_value = (
             bugz_inst.find_bugs.return_value)
@@ -1446,7 +1477,8 @@ class IntegrationSuccessTests(IntegrationTestCase):
             560322: BugInfo(BugCategory.STABLEREQ,
                             'test/mixed-keywords-5 amd64 hppa\r\n',
                             last_change_time=datetime.datetime(
-                                2020, 1, 1, 12, 0, 0)),
+                                2020, 1, 1, 12, 0, 0,
+                                tzinfo=datetime.timezone.utc)),
         }
         bugz_inst.resolve_dependencies.return_value = (
             bugz_inst.find_bugs.return_value)
@@ -1467,7 +1499,8 @@ class IntegrationSuccessTests(IntegrationTestCase):
             560322: BugInfo(BugCategory.STABLEREQ,
                             'test/mixed-keywords-5 amd64 hppa alpha\r\n',
                             last_change_time=datetime.datetime(
-                                2020, 1, 1, 12, 0, 0)),
+                                2020, 1, 1, 12, 0, 0,
+                                tzinfo=datetime.timezone.utc)),
         }
         bugz_inst.resolve_dependencies.return_value = (
             bugz_inst.find_bugs.return_value)
@@ -1488,7 +1521,8 @@ class IntegrationSuccessTests(IntegrationTestCase):
                             'test/amd64-testing-1 amd64\r\n',
                             keywords=['ALLARCHES'],
                             last_change_time=datetime.datetime(
-                                2020, 1, 1, 12, 0, 0)),
+                                2020, 1, 1, 12, 0, 0,
+                                tzinfo=datetime.timezone.utc)),
         }
         bugz_inst.resolve_dependencies.return_value = (
             bugz_inst.find_bugs.return_value)
@@ -1510,7 +1544,8 @@ class IntegrationSuccessTests(IntegrationTestCase):
                             'test/amd64-stable-hppa-testing-1 hppa\r\n',
                             sanity_check=True,
                             last_change_time=datetime.datetime(
-                                2020, 1, 1, 12, 0, 0)),
+                                2020, 1, 1, 12, 0, 0,
+                                tzinfo=datetime.timezone.utc)),
         }
         bugz_inst.resolve_dependencies.return_value = (
             bugz_inst.find_bugs.return_value)
@@ -1531,7 +1566,8 @@ class IntegrationSuccessTests(IntegrationTestCase):
                             keywords=['ALLARCHES'],
                             sanity_check=True,
                             last_change_time=datetime.datetime(
-                                2020, 1, 1, 12, 0, 0)),
+                                2020, 1, 1, 12, 0, 0,
+                                tzinfo=datetime.timezone.utc)),
         }
         bugz_inst.resolve_dependencies.return_value = (
             bugz_inst.find_bugs.return_value)
@@ -1552,7 +1588,8 @@ class IntegrationSuccessTests(IntegrationTestCase):
                             'test/amd64-testing-2 ^\r\n',
                             ['amd64@gentoo.org'],
                             last_change_time=datetime.datetime(
-                                2020, 1, 1, 12, 0, 0)),
+                                2020, 1, 1, 12, 0, 0,
+                                tzinfo=datetime.timezone.utc)),
         }
         bugz_inst.resolve_dependencies.return_value = (
             bugz_inst.find_bugs.return_value)
@@ -1576,7 +1613,8 @@ class IntegrationSuccessTests(IntegrationTestCase):
                             'test/amd64-testing-2 ^\r\n',
                             keywords=['CC-ARCHES'],
                             last_change_time=datetime.datetime(
-                                2020, 1, 1, 12, 0, 0)),
+                                2020, 1, 1, 12, 0, 0,
+                                tzinfo=datetime.timezone.utc)),
         }
         bugz_inst.resolve_dependencies.return_value = (
             bugz_inst.find_bugs.return_value)
@@ -1600,7 +1638,8 @@ class IntegrationSuccessTests(IntegrationTestCase):
                             'test/mixed-keywords-3 *\r\n'
                             'test/amd64-testing-2 ^\r\n',
                             last_change_time=datetime.datetime(
-                                2020, 1, 1, 12, 0, 0)),
+                                2020, 1, 1, 12, 0, 0,
+                                tzinfo=datetime.timezone.utc)),
         }
         bugz_inst.resolve_dependencies.return_value = (
             bugz_inst.find_bugs.return_value)
@@ -1621,7 +1660,8 @@ class IntegrationSuccessTests(IntegrationTestCase):
                             ['amd64@gentoo.org', 'hppa@gentoo.org'],
                             sanity_check=True,
                             last_change_time=datetime.datetime(
-                                2020, 1, 1, 12, 0, 0)),
+                                2020, 1, 1, 12, 0, 0,
+                                tzinfo=datetime.timezone.utc)),
         }
         bugz_inst.resolve_dependencies.return_value = (
             bugz_inst.find_bugs.return_value)
@@ -1646,7 +1686,8 @@ class IntegrationSuccessTests(IntegrationTestCase):
                             'test/amd64-testing-2 ^ hppa\r\n',
                             ['amd64@gentoo.org', 'hppa@gentoo.org'],
                             last_change_time=datetime.datetime(
-                                2020, 1, 1, 12, 0, 0)),
+                                2020, 1, 1, 12, 0, 0,
+                                tzinfo=datetime.timezone.utc)),
         }
         bugz_inst.resolve_dependencies.return_value = (
             bugz_inst.find_bugs.return_value)
@@ -1666,7 +1707,8 @@ class IntegrationSuccessTests(IntegrationTestCase):
                             'test/mixed-keywords-3\r\n',
                             keywords=['CC-ARCHES'],
                             last_change_time=datetime.datetime(
-                                2020, 1, 1, 12, 0, 0)),
+                                2020, 1, 1, 12, 0, 0,
+                                tzinfo=datetime.timezone.utc)),
         }
         bugz_inst.resolve_dependencies.return_value = (
             bugz_inst.find_bugs.return_value)
@@ -1713,10 +1755,13 @@ class IntegrationSuccessTests(IntegrationTestCase):
         """Test that freshly updated bugs are skipped"""
         bugz_inst = self.bug_preset(bugz,
                                     last_change_time=datetime.datetime(
-                                        2020, 1, 1, 12, 0, 0))
+                                        2020, 1, 1, 12, 0, 0,
+                                        tzinfo=datetime.timezone.utc))
 
-        with patch('nattka.__main__.datetime.datetime',
-                   new=FakeDateTime(datetime.datetime(2020, 1, 1, 12, 0, 30))):
+        fake_now = datetime.datetime(2020, 1, 1, 12, 0, 30,
+                                     tzinfo=datetime.timezone.utc)
+        with patch('nattka.__main__.datetime',
+                   new=FakeDateTime(fake_now)):
             self.assertEqual(
                 main(self.common_args + ['sanity-check', '--update-bugs',
                                          '560322']),
@@ -1943,7 +1988,8 @@ class IntegrationFailureTests(IntegrationTestCase):
                             'test/amd64-testing-deps-1 ~alpha\r\n',
                             sanity_check=initial_status,
                             last_change_time=datetime.datetime(
-                                2020, 1, 1, 12, 0, 0),
+                                2020, 1, 1, 12, 0, 0,
+                                tzinfo=datetime.timezone.utc),
                             **kwargs),
         }
         bugz_inst.resolve_dependencies.return_value = (
@@ -2063,7 +2109,8 @@ class IntegrationFailureTests(IntegrationTestCase):
             560322: BugInfo(BugCategory.KEYWORDREQ,
                             '<>amd64-testing-deps-1 ~alpha\r\n',
                             last_change_time=datetime.datetime(
-                                2020, 1, 1, 12, 0, 0)),
+                                2020, 1, 1, 12, 0, 0,
+                                tzinfo=datetime.timezone.utc)),
         }
         bugz_inst.resolve_dependencies.return_value = (
             bugz_inst.find_bugs.return_value)
@@ -2091,7 +2138,8 @@ class IntegrationFailureTests(IntegrationTestCase):
                             '<>amd64-testing-deps-1 ~alpha\r\n',
                             sanity_check=False,
                             last_change_time=datetime.datetime(
-                                2020, 1, 1, 12, 0, 0)),
+                                2020, 1, 1, 12, 0, 0,
+                                tzinfo=datetime.timezone.utc)),
         }
         bugz_inst.resolve_dependencies.return_value = (
             bugz_inst.find_bugs.return_value)
@@ -2115,7 +2163,8 @@ class IntegrationFailureTests(IntegrationTestCase):
             560322: BugInfo(BugCategory.STABLEREQ,
                             '>=test/amd64-testing-deps-1 ~alpha\r\n',
                             last_change_time=datetime.datetime(
-                                2020, 1, 1, 12, 0, 0)),
+                                2020, 1, 1, 12, 0, 0,
+                                tzinfo=datetime.timezone.utc)),
         }
         bugz_inst.resolve_dependencies.return_value = (
             bugz_inst.find_bugs.return_value)
@@ -2137,7 +2186,8 @@ class IntegrationFailureTests(IntegrationTestCase):
             560322: BugInfo(BugCategory.KEYWORDREQ,
                             'test/enoent-7 ~alpha\r\n',
                             last_change_time=datetime.datetime(
-                                2020, 1, 1, 12, 0, 0)),
+                                2020, 1, 1, 12, 0, 0,
+                                tzinfo=datetime.timezone.utc)),
         }
         bugz_inst.resolve_dependencies.return_value = (
             bugz_inst.find_bugs.return_value)
@@ -2159,7 +2209,8 @@ class IntegrationFailureTests(IntegrationTestCase):
             560322: BugInfo(BugCategory.KEYWORDREQ,
                             'test/amd64-testing-1 amd64 ~mysuperarch\r\n',
                             last_change_time=datetime.datetime(
-                                2020, 1, 1, 12, 0, 0)),
+                                2020, 1, 1, 12, 0, 0,
+                                tzinfo=datetime.timezone.utc)),
         }
         bugz_inst.resolve_dependencies.return_value = (
             bugz_inst.find_bugs.return_value)
@@ -2180,7 +2231,8 @@ class IntegrationFailureTests(IntegrationTestCase):
             560322: BugInfo(BugCategory.STABLEREQ,
                             'test/masked-package-1 amd64\r\n',
                             last_change_time=datetime.datetime(
-                                2020, 1, 1, 12, 0, 0)),
+                                2020, 1, 1, 12, 0, 0,
+                                tzinfo=datetime.timezone.utc)),
         }
         bugz_inst.resolve_dependencies.return_value = (
             bugz_inst.find_bugs.return_value)
@@ -2200,7 +2252,8 @@ class IntegrationFailureTests(IntegrationTestCase):
             560322: BugInfo(BugCategory.KEYWORDREQ,
                             'test/profile-masked-package-1 amd64\r\n',
                             last_change_time=datetime.datetime(
-                                2020, 1, 1, 12, 0, 0)),
+                                2020, 1, 1, 12, 0, 0,
+                                tzinfo=datetime.timezone.utc)),
         }
         bugz_inst.resolve_dependencies.return_value = (
             bugz_inst.find_bugs.return_value)
@@ -2221,7 +2274,8 @@ class IntegrationFailureTests(IntegrationTestCase):
             560322: BugInfo(BugCategory.KEYWORDREQ,
                             'test/partially-masked-package-1 amd64\r\n',
                             last_change_time=datetime.datetime(
-                                2020, 1, 1, 12, 0, 0)),
+                                2020, 1, 1, 12, 0, 0,
+                                tzinfo=datetime.timezone.utc)),
         }
         bugz_inst.resolve_dependencies.return_value = (
             bugz_inst.find_bugs.return_value)
@@ -2245,14 +2299,16 @@ class IntegrationFailureTests(IntegrationTestCase):
                             'test/amd64-testing-deps-1 ~alpha\r\n',
                             depends=[560311],
                             last_change_time=datetime.datetime(
-                                2020, 1, 1, 12, 0, 0)),
+                                2020, 1, 1, 12, 0, 0,
+                                tzinfo=datetime.timezone.utc)),
         }
         bugz_inst.resolve_dependencies.return_value = {
             560311: BugInfo(BugCategory.KEYWORDREQ,
                             'test/enoent-7 ~alpha\r\n',
                             blocks=[560322],
                             last_change_time=datetime.datetime(
-                                2020, 1, 1, 12, 0, 0)),
+                                2020, 1, 1, 12, 0, 0,
+                                tzinfo=datetime.timezone.utc)),
         }
         bugz_inst.resolve_dependencies.return_value.update(
             bugz_inst.find_bugs.return_value)
@@ -2278,14 +2334,16 @@ class IntegrationFailureTests(IntegrationTestCase):
                             'test/enoent-1 ~alpha\r\n',
                             depends=[560311],
                             last_change_time=datetime.datetime(
-                                2020, 1, 1, 12, 0, 0)),
+                                2020, 1, 1, 12, 0, 0,
+                                tzinfo=datetime.timezone.utc)),
         }
         bugz_inst.resolve_dependencies.return_value = {
             560311: BugInfo(BugCategory.KEYWORDREQ,
                             'test/enoent-7 ~alpha\r\n',
                             blocks=[560322],
                             last_change_time=datetime.datetime(
-                                2020, 1, 1, 12, 0, 0)),
+                                2020, 1, 1, 12, 0, 0,
+                                tzinfo=datetime.timezone.utc)),
         }
         bugz_inst.resolve_dependencies.return_value.update(
             bugz_inst.find_bugs.return_value)
@@ -2310,14 +2368,16 @@ class IntegrationFailureTests(IntegrationTestCase):
                             'test/amd64-testing-deps-1 ~alpha\r\n',
                             depends=[560311],
                             last_change_time=datetime.datetime(
-                                2020, 1, 1, 12, 0, 0)),
+                                2020, 1, 1, 12, 0, 0,
+                                tzinfo=datetime.timezone.utc)),
         }
         bugz_inst.resolve_dependencies.return_value = {
             560311: BugInfo(BugCategory.KEYWORDREQ,
                             'test/amd64-testing-1',
                             blocks=[560322],
                             last_change_time=datetime.datetime(
-                                2020, 1, 1, 12, 0, 0)),
+                                2020, 1, 1, 12, 0, 0,
+                                tzinfo=datetime.timezone.utc)),
         }
         bugz_inst.resolve_dependencies.return_value.update(
             bugz_inst.find_bugs.return_value)
@@ -2354,27 +2414,32 @@ class IntegrationFailureTests(IntegrationTestCase):
             560322: BugInfo(BugCategory.KEYWORDREQ,
                             'test/amd64-testing-1 alpha ~hppa\r\n',
                             last_change_time=datetime.datetime(
-                                2020, 1, 1, 12, 0, 0)),
+                                2020, 1, 1, 12, 0, 0,
+                                tzinfo=datetime.timezone.utc)),
             560324: BugInfo(BugCategory.STABLEREQ,
                             'test/amd64-testing-1 amd64\r\n',
                             last_change_time=datetime.datetime(
-                                2020, 1, 1, 12, 0, 0)),
+                                2020, 1, 1, 12, 0, 0,
+                                tzinfo=datetime.timezone.utc)),
             # security bugs
             560332: BugInfo(BugCategory.KEYWORDREQ,
                             'test/amd64-testing-1 alpha ~hppa\r\n',
                             keywords=['SECURITY'],
                             last_change_time=datetime.datetime(
-                                2020, 1, 1, 12, 0, 0)),
+                                2020, 1, 1, 12, 0, 0,
+                                tzinfo=datetime.timezone.utc)),
             560334: BugInfo(BugCategory.STABLEREQ,
                             'test/amd64-testing-1 amd64\r\n',
                             keywords=['SECURITY'],
                             last_change_time=datetime.datetime(
-                                2020, 1, 1, 12, 0, 0)),
+                                2020, 1, 1, 12, 0, 0,
+                                tzinfo=datetime.timezone.utc)),
             560336: BugInfo(BugCategory.STABLEREQ,
                             'test/alpha-amd64-hppa-testing-2 amd64 hppa\r\n',
                             security=True,
                             last_change_time=datetime.datetime(
-                                2020, 1, 1, 12, 0, 0)),
+                                2020, 1, 1, 12, 0, 0,
+                                tzinfo=datetime.timezone.utc)),
         }
         bugz_inst.find_bugs.return_value = bugs
         bugz_inst.resolve_dependencies.return_value = bugs
@@ -2401,13 +2466,15 @@ class IntegrationFailureTests(IntegrationTestCase):
                             '',
                             security=True,
                             last_change_time=datetime.datetime(
-                                2020, 1, 1, 12, 0, 0)),
+                                2020, 1, 1, 12, 0, 0,
+                                tzinfo=datetime.timezone.utc)),
             # respective stablereq
             560334: BugInfo(BugCategory.STABLEREQ,
                             'test/amd64-testing-1 amd64\r\n',
                             blocks=[560324],
                             last_change_time=datetime.datetime(
-                                2020, 1, 1, 12, 0, 0)),
+                                2020, 1, 1, 12, 0, 0,
+                                tzinfo=datetime.timezone.utc)),
         }
         bugz_inst.find_bugs.return_value = bugs
         bugz_inst.resolve_dependencies.return_value = bugs
@@ -2432,13 +2499,15 @@ class IntegrationFailureTests(IntegrationTestCase):
                             '',
                             security=True,
                             last_change_time=datetime.datetime(
-                                2020, 1, 1, 12, 0, 0)),
+                                2020, 1, 1, 12, 0, 0,
+                                tzinfo=datetime.timezone.utc)),
             # respective stablereq
             560334: BugInfo(BugCategory.KEYWORDREQ,
                             'test/amd64-testing-1 alpha ~hppa\r\n',
                             blocks=[560324],
                             last_change_time=datetime.datetime(
-                                2020, 1, 1, 12, 0, 0)),
+                                2020, 1, 1, 12, 0, 0,
+                                tzinfo=datetime.timezone.utc)),
         }
         bugz_inst.find_bugs.return_value = bugs
         bugz_inst.resolve_dependencies.return_value = bugs
@@ -2468,7 +2537,8 @@ class IntegrationLimiterTests(IntegrationTestCase):
             bugs[100000 + i] = BugInfo(BugCategory.STABLEREQ,
                                        'test/amd64-testing-1 amd64\r\n',
                                        last_change_time=datetime.datetime(
-                                           2020, 1, 1, 12, 0, 0))
+                                           2020, 1, 1, 12, 0, 0,
+                                           tzinfo=datetime.timezone.utc))
 
         bugz_inst = bugz.return_value
         bugz_inst.find_bugs.return_value = bugs
